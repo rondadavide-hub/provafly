@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fly Flot — Desideriamo ascoltarti</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* Brand colors — Fly Flot Manifesto */
+    --indigo: #003260;          /* Fly Flot Indigo — primary */
+    --indigo-deep: #001E3D;     /* indigo più scuro per hover/contrasti */
+    --bright-sky: #00C8FF;      /* Bright Sky — secondary, CTA */
+    --bright-sky-hover: #00A8DA;
+    --pale-sky-light: #E6F8FF;  /* derivato chiaro per backgrounds selected */
+    --pale-sky-text: #00547A;   /* testo leggibile su pale-sky */
+    --bg: #F4F6F9;
+    --border: #E5E9EF;
+    --border-hover: #B0DFF2;
+    --text: #161614;            /* Black brand */
+    --text-mute: #6B7785;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 40px 16px 60px;
+    color: var(--text);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  .container {
+    width: 100%;
+    max-width: 560px;
+  }
+
+  /* Header */
+  .header {
+    position: relative;
+    background: var(--indigo);
+    border-radius: 14px 14px 0 0;
+    padding: 30px 32px 30px;
+    color: white;
+    overflow: hidden;
+  }
+  /* Pattern wavy come nelle DEM */
+  .header::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 240'><g fill='none' stroke='%23ffffff' stroke-opacity='0.07' stroke-width='1.4'><path d='M-40 40 Q120 0 280 40 T620 40'/><path d='M-40 90 Q120 50 280 90 T620 90'/><path d='M-40 140 Q120 100 280 140 T620 140'/><path d='M-40 190 Q120 150 280 190 T620 190'/></g></svg>");
+    background-size: cover;
+    background-position: center;
+    pointer-events: none;
+  }
+  .header > * { position: relative; z-index: 1; }
+
+  /* Logo Fly Flot ufficiale */
+  .brand {
+    margin-bottom: 22px;
+  }
+  .brand svg {
+    width: 168px;
+    height: auto;
+    display: block;
+  }
+
+  .header h1 {
+    font-size: 24px;
+    font-weight: 800;
+    line-height: 1.25;
+    color: white;
+    margin-bottom: 12px;
+    letter-spacing: -.01em;
+  }
+  .header p {
+    font-size: 14.5px;
+    color: rgba(255,255,255,.78);
+    line-height: 1.6;
+    font-weight: 400;
+  }
+
+  /* Progress */
+  .progress-wrap {
+    background: white;
+    padding: 18px 32px;
+    border-left: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+  }
+  .progress-bar {
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--bright-sky);
+    border-radius: 2px;
+    transition: width .4s ease;
+  }
+
+  /* Card */
+  .card {
+    background: white;
+    border: 1px solid var(--border);
+    border-top: none;
+    border-radius: 0 0 14px 14px;
+    padding: 32px;
+  }
+
+  /* Question */
+  .q-wrap { display: none; }
+  .q-wrap.active { display: block; }
+
+  .q-meta {
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--bright-sky);
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .q-text {
+    font-size: 19px;
+    font-weight: 700;
+    line-height: 1.4;
+    color: var(--indigo);
+    margin-bottom: 6px;
+    letter-spacing: -.005em;
+  }
+  .q-hint {
+    font-size: 13.5px;
+    color: var(--text-mute);
+    line-height: 1.55;
+    margin-bottom: 20px;
+    font-weight: 400;
+  }
+
+  /* Options */
+  .options { display: flex; flex-direction: column; gap: 10px; }
+
+  .opt {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 16px;
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: border-color .15s, background .15s, color .15s;
+    font-size: 14px;
+    color: var(--text);
+    line-height: 1.45;
+    background: white;
+    text-align: left;
+    width: 100%;
+    font-family: inherit;
+    font-weight: 600;
+  }
+  .opt:hover { border-color: var(--border-hover); background: #F6FBFD; }
+  .opt.selected { border-color: var(--bright-sky); background: var(--pale-sky-light); color: var(--pale-sky-text); }
+
+  .dot {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 2px solid #CCD4DC;
+    flex-shrink: 0;
+    margin-top: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color .15s, background .15s;
+  }
+  .opt.selected .dot {
+    border-color: var(--bright-sky);
+    background: var(--bright-sky);
+  }
+  .dot-inner {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: white;
+    display: none;
+  }
+  .opt.selected .dot-inner { display: block; }
+
+  /* Textarea & input */
+  .textarea-wrap { margin-bottom: 4px; }
+  textarea, input[type="text"], input[type="email"] {
+    width: 100%;
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 13px 16px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
+    line-height: 1.6;
+    background: white;
+    transition: border-color .15s, box-shadow .15s;
+  }
+  textarea {
+    resize: vertical;
+    min-height: 100px;
+  }
+  textarea:focus, input:focus {
+    outline: none;
+    border-color: var(--bright-sky);
+    box-shadow: 0 0 0 3px rgba(0,200,255,.12);
+  }
+  textarea::placeholder, input::placeholder { color: #AAB0B8; font-weight: 400; }
+  .optional-note {
+    font-size: 12px;
+    color: #AAB0B8;
+    margin-top: 6px;
+  }
+
+  /* Identity fields */
+  .id-fields {
+    display: none;
+    margin-top: 16px;
+    flex-direction: column;
+    gap: 12px;
+    animation: fadeIn .25s ease;
+  }
+  .id-fields.show { display: flex; }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .id-field-label {
+    font-size: 12px;
+    color: var(--text-mute);
+    font-weight: 600;
+    margin-bottom: 5px;
+    margin-left: 2px;
+  }
+  .id-field {
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Nota privacy */
+  .privacy-note {
+    margin-top: 6px;
+    padding: 12px 14px;
+    background: #F4F6F9;
+    border-radius: 10px;
+    font-size: 12px;
+    line-height: 1.55;
+    color: var(--text-mute);
+    font-weight: 400;
+  }
+  .privacy-note a {
+    color: var(--indigo);
+    font-weight: 600;
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 2px;
+  }
+  .privacy-note a:hover {
+    color: var(--bright-sky-hover);
+  }
+
+  /* Nav */
+  .nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 28px;
+    padding-top: 20px;
+    border-top: 1px solid #F0F2F5;
+  }
+  .step-ct { font-size: 12px; color: #AAB0B8; font-weight: 600; }
+
+  .btn-back {
+    padding: 10px 20px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1.5px solid var(--border);
+    background: white;
+    color: var(--text-mute);
+    transition: all .15s;
+    font-family: inherit;
+  }
+  .btn-back:hover { border-color: #CCD4DC; color: var(--indigo); }
+  .btn-back.hidden { visibility: hidden; }
+
+  .btn-next {
+    padding: 11px 26px;
+    border-radius: 999px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    border: none;
+    background: var(--bright-sky);
+    color: white;
+    transition: background .15s, transform .1s, box-shadow .15s;
+    letter-spacing: .01em;
+    font-family: inherit;
+    min-width: 120px;
+    box-shadow: 0 1px 3px rgba(0,200,255,.3);
+  }
+  .btn-next:hover:not(:disabled) {
+    background: var(--bright-sky-hover);
+    box-shadow: 0 2px 8px rgba(0,200,255,.35);
+  }
+  .btn-next:active:not(:disabled) { transform: translateY(1px); }
+  .btn-next:disabled { opacity: .4; cursor: not-allowed; background: var(--bright-sky); box-shadow: none; }
+
+  /* Spinner */
+  .spinner {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(255,255,255,.4);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin .7s linear infinite;
+    vertical-align: middle;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Thank you & error */
+  .thankyou, .errscreen {
+    display: none;
+    text-align: center;
+    padding: 20px 0 12px;
+  }
+  .check-circle, .err-circle {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: var(--pale-sky-light);
+    color: var(--bright-sky);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 22px;
+    font-size: 28px;
+    font-weight: 700;
+  }
+  .err-circle { background: #FDECEC; color: #B23A3A; }
+  .thankyou h2, .errscreen h2 {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--indigo);
+    margin-bottom: 12px;
+    letter-spacing: -.01em;
+  }
+  .thankyou p, .errscreen p {
+    font-size: 14.5px;
+    color: var(--text-mute);
+    line-height: 1.7;
+    font-weight: 400;
+  }
+  .thankyou .brand-close {
+    margin-top: 28px;
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--indigo);
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+  .btn-retry {
+    margin-top: 22px;
+    padding: 11px 24px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    border: 1.5px solid var(--border);
+    background: white;
+    color: var(--indigo);
+    font-family: inherit;
+  }
+  .btn-retry:hover { border-color: #CCD4DC; }
+
+  @media (max-width: 480px) {
+    body { padding: 0 0 40px; }
+    .header { border-radius: 0; padding: 26px 22px 26px; }
+    .card { border-radius: 0; padding: 26px 22px; }
+    .progress-wrap { padding: 18px 22px; border-left: none; border-right: none; }
+    .header h1 { font-size: 21px; }
+    .brand svg { width: 150px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <!-- Logo Fly Flot ufficiale (versione bianca orizzontale) -->
+    <div class="brand">
+      <svg viewBox="0 0 312.84 44.86" xmlns="http://www.w3.org/2000/svg" aria-label="Fly Flot">
+        <g fill="#fff">
+          <path d="M18.11,4.73c14.07,1.19,18.24,1.83,26.67,13.79-8.12,13.18,2.89,4.85,7.86.41,5.27-2.12,10.51-4.59,13.96-.02,2.05,2.68,8.81,7.01,7.34.45-1.61-8.07-8.11-11.73-16.11-7.86-.33-3.83-5.09-2.41-7.8.05C41.29.69,35.03-2.64,20.44,2.1c-1.5.38-4.79,1.74-2.33,2.63Z"/>
+          <path d="M81.84,29.77c-16.78-2.92-24.91-4.36-40.91,5.52C26.84,26.58,17.64,24.31.75,27.46c-1.92.3.35,1.29,1.28,1.55,14.07,2.39,18.08-1.56,30.76,8.17,4.63,3.11.41,1.47-.51,3.33,3.75,2.35,8.57,3.94,13.08,4.33,4.77.34,5.98-4.91,1.22-6.93-.36-.12-.76-.34-.24-.59,15.72-12.06,27.66-1.47,35.71-6.5.45-.28.32-.96-.2-1.05Z"/>
+          <path d="M122.26,9.33h-18.92c-.92,0-1.75.33-2.39.95-.65.63-1,1.47-1,2.44v28.34c0,.93.34,1.76.98,2.4.64.64,1.47.98,2.4.98s1.76-.34,2.4-.98c.64-.64.98-1.47.98-2.4v-11.1h10.81c.96,0,1.76-.3,2.39-.9.63-.6.96-1.4.96-2.31s-.33-1.71-.95-2.31c-.62-.6-1.43-.9-2.39-.9h-10.81v-7.76h15.54c.95,0,1.75-.29,2.37-.87.64-.59.97-1.39.97-2.31s-.33-1.75-.95-2.35c-.62-.6-1.43-.9-2.39-.9Z"/>
+          <path d="M149.43,37.68h-13.95V12.71c0-.93-.34-1.76-.98-2.4-.64-.64-1.47-.98-2.4-.98s-1.72.34-2.36.98c-.64.64-.98,1.47-.98,2.4v28.34c0,.92.33,1.75.95,2.39.63.65,1.46,1,2.4,1h17.33c.93,0,1.76-.34,2.4-.98.64-.64.98-1.47.98-2.4s-.34-1.76-.98-2.4c-.64-.64-1.47-.98-2.4-.98Z"/>
+          <path d="M180.79,10.23c-.56-.59-1.3-.9-2.13-.9-.66,0-1.25.15-1.75.44-.46.27-.86.66-1.19,1.14h0s0,.02,0,.02l-8.94,14.1-8.78-13.93c-.33-.52-.7-.93-1.09-1.22-.49-.37-1.12-.56-1.85-.56-.81,0-1.53.25-2.15.74-.64.5-1.04,1.2-1.17,2.01-.13.81.07,1.65.58,2.48h0s0,.02,0,.02l10.99,17.08v9.4c0,.93.34,1.76.98,2.4.64.64,1.46.98,2.36.98s1.76-.34,2.4-.98.98-1.47.98-2.4v-9.4l11.07-17.08c.49-.78.69-1.56.61-2.36-.09-.79-.39-1.46-.91-2Z"/>
+          <path d="M215.63,9.33h-18.92c-.92,0-1.75.33-2.39.95-.65.63-1,1.47-1,2.44v28.34c0,.93.34,1.76.98,2.4.64.64,1.47.98,2.4.98s1.76-.34,2.4-.98c.64-.64.98-1.47.98-2.4v-11.1h10.81c.96,0,1.76-.3,2.39-.9.63-.6.96-1.4.96-2.31s-.33-1.71-.95-2.31c-.62-.6-1.43-.9-2.39-.9h-10.81v-7.76h15.54c.95,0,1.75-.29,2.37-.87.64-.59.97-1.39.97-2.31s-.33-1.75-.95-2.35c-.62-.6-1.43-.9-2.39-.9Z"/>
+          <path d="M242.8,37.68h-13.95V12.71c0-.93-.34-1.76-.98-2.4-.64-.64-1.47-.98-2.4-.98s-1.72.34-2.36.98c-.64.64-.98,1.47-.98,2.4v28.34c0,.92.33,1.75.95,2.39.63.65,1.46,1,2.4,1h17.33c.93,0,1.76-.34,2.4-.98.64-.64.98-1.47.98-2.4s-.34-1.76-.98-2.4c-.64-.64-1.47-.98-2.4-.98Z"/>
+          <path d="M278.16,13.98c-1.59-1.6-3.49-2.86-5.66-3.74-2.16-.88-4.57-1.32-7.17-1.32s-5.02.45-7.19,1.32c-2.18.88-4.09,2.14-5.66,3.75-1.57,1.6-2.81,3.52-3.67,5.7-.86,2.17-1.3,4.59-1.3,7.19s.44,5.02,1.3,7.2c.87,2.19,2.1,4.12,3.67,5.72,1.58,1.61,3.48,2.87,5.66,3.75,2.17.88,4.59,1.32,7.19,1.32s5.01-.45,7.17-1.32c2.17-.88,4.07-2.14,5.66-3.74,1.59-1.6,2.83-3.53,3.7-5.72.86-2.18,1.3-4.61,1.3-7.2s-.44-5.02-1.3-7.19c-.87-2.18-2.11-4.1-3.7-5.7ZM265.32,38.51c-1.64,0-3.16-.3-4.53-.89-1.36-.59-2.55-1.41-3.54-2.45-.99-1.04-1.77-2.28-2.33-3.69-.56-1.41-.84-2.97-.84-4.63s.28-3.21.84-4.62c.55-1.41,1.34-2.65,2.33-3.69.98-1.03,2.17-1.85,3.53-2.42,1.36-.58,2.89-.87,4.53-.87s3.17.29,4.53.87c1.36.58,2.56,1.39,3.56,2.43,1,1.04,1.78,2.27,2.32,3.68.54,1.42.82,2.98.82,4.63s-.28,3.22-.82,4.63c-.54,1.4-1.32,2.64-2.32,3.68-1,1.04-2.2,1.86-3.57,2.45-1.36.59-2.89.89-4.53.89Z"/>
+          <path d="M311.92,10.25c-.6-.6-1.4-.92-2.3-.92h-22.4c-.9,0-1.7.32-2.3.92-.6.6-.92,1.4-.92,2.3s.32,1.7.92,2.3c.6.6,1.4.92,2.3.92h7.84v25.3c0,.93.34,1.76.98,2.4s1.47.98,2.4.98,1.76-.34,2.4-.98c.64-.64.98-1.47.98-2.4V15.76h7.79c.9,0,1.7-.32,2.3-.92.6-.6.92-1.4.92-2.3s-.32-1.7-.92-2.3Z"/>
+        </g>
+      </svg>
+    </div>
+
+    <h1>Prima di vederci, desideriamo ascoltarti</h1>
+    <p>Quattro domande su di voi e sul vostro lavoro: per arrivare all'appuntamento già pronti ad ascoltarvi.</p>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress-bar"><div class="progress-fill" id="prog" style="width:0%"></div></div>
+  </div>
+
+  <div class="card">
+
+    <!-- Q1 -->
+    <div class="q-wrap active" id="q1">
+      <div class="q-meta">Domanda 1 di 4</div>
+      <div class="q-text">Com'è andata la stagione Primavera/Estate precedente per voi?</div>
+      <div class="options">
+        <button class="opt" onclick="selectOpt(this,'q1')"><div class="dot"><div class="dot-inner"></div></div>Molto bene: meglio delle aspettative</button>
+        <button class="opt" onclick="selectOpt(this,'q1')"><div class="dot"><div class="dot-inner"></div></div>Bene: in linea con quello che ci aspettavamo</button>
+        <button class="opt" onclick="selectOpt(this,'q1')"><div class="dot"><div class="dot-inner"></div></div>Sotto le aspettative: è stata una stagione difficile</button>
+        <button class="opt" onclick="selectOpt(this,'q1')"><div class="dot"><div class="dot-inner"></div></div>Altalenante: dipende molto dai prodotti e dai mercati</button>
+      </div>
+    </div>
+
+    <!-- Q2 -->
+    <div class="q-wrap" id="q2">
+      <div class="q-meta">Domanda 2 di 4</div>
+      <div class="q-text">Cosa vi ha dato più soddisfazione nel lavorare con Fly Flot finora?</div>
+      <div class="options">
+        <button class="opt" onclick="selectOpt(this,'q2')"><div class="dot"><div class="dot-inner"></div></div>La qualità del prodotto: pochi problemi, clienti soddisfatti</button>
+        <button class="opt" onclick="selectOpt(this,'q2')"><div class="dot"><div class="dot-inner"></div></div>L'affidabilità: consegne puntuali, condizioni rispettate</button>
+        <button class="opt" onclick="selectOpt(this,'q2')"><div class="dot"><div class="dot-inner"></div></div>Il rapporto con le persone: con chi lavoriamo ogni giorno</button>
+        <button class="opt" onclick="selectOpt(this,'q2')"><div class="dot"><div class="dot-inner"></div></div>La rotazione: il prodotto si vende, i clienti tornano</button>
+      </div>
+    </div>
+
+    <!-- Q3 -->
+    <div class="q-wrap" id="q3">
+      <div class="q-meta">Domanda 3 di 4</div>
+      <div class="q-text">C'è qualcosa che vorreste che Fly Flot facesse diversamente?</div>
+      <div class="options">
+        <button class="opt" onclick="selectOpt(this,'q3')"><div class="dot"><div class="dot-inner"></div></div>Più supporto nel punto vendita: materiali, espositori, strumenti</button>
+        <button class="opt" onclick="selectOpt(this,'q3')"><div class="dot"><div class="dot-inner"></div></div>Comunicazione più aggiornata: ci aiuterebbe a spiegare il prodotto meglio</button>
+        <button class="opt" onclick="selectOpt(this,'q3')"><div class="dot"><div class="dot-inner"></div></div>Più flessibilità negli ordini e nelle consegne</button>
+        <button class="opt" onclick="selectOpt(this,'q3')"><div class="dot"><div class="dot-inner"></div></div>Onestamente? Non cambierei molto: funziona</button>
+      </div>
+    </div>
+
+    <!-- Q4 -->
+    <div class="q-wrap" id="q4">
+      <div class="q-meta">Domanda 4 di 4</div>
+      <div class="q-text">C'è qualcosa che volete dirci prima di vederci?</div>
+      <div class="q-hint">Lo leggiamo noi prima dell'appuntamento.</div>
+      <div class="textarea-wrap">
+        <textarea id="q4text" placeholder="Scrivete pure liberamente..." oninput="updateNav()"></textarea>
+      </div>
+      <div class="optional-note">Campo facoltativo: potete lasciarlo vuoto.</div>
+    </div>
+
+    <!-- Q5: identity -->
+    <div class="q-wrap" id="q5">
+      <div class="q-meta">Quasi fatto.</div>
+      <div class="q-text" style="margin-bottom: 22px">Potete restare anonimi, oppure lasciare i vostri dati: scegliete voi.</div>
+      <div class="options">
+        <button class="opt" onclick="selectIdentity(this, true)"><div class="dot"><div class="dot-inner"></div></div>Voglio condividere i miei dati</button>
+        <button class="opt" onclick="selectIdentity(this, false)"><div class="dot"><div class="dot-inner"></div></div>Preferisco restare anonimo</button>
+      </div>
+
+      <div class="id-fields" id="idFields">
+        <div class="id-field">
+          <div class="id-field-label">Azienda o negozio</div>
+          <input type="text" id="fAzienda" placeholder="Es. Calzature Rossi" oninput="updateNav()">
+        </div>
+        <div class="id-field">
+          <div class="id-field-label">Nome</div>
+          <input type="text" id="fNome" placeholder="Es. Marco" oninput="updateNav()">
+        </div>
+        <div class="id-field">
+          <div class="id-field-label">Cognome</div>
+          <input type="text" id="fCognome" placeholder="Es. Rossi" oninput="updateNav()">
+        </div>
+        <div class="id-field">
+          <div class="id-field-label">Email <span style="color:#AAB0B8;font-weight:500">(facoltativa)</span></div>
+          <input type="email" id="fEmail" placeholder="nome@esempio.it" oninput="updateNav()">
+        </div>
+        <div class="privacy-note">
+          I dati che ci lasciate sono trattati da Fly Flot S.r.l. per prepararci al vostro appuntamento e nell'ambito del rapporto commerciale in corso. Non sono condivisi con terze parti.
+          <a href="https://www.flyflot.it/24-privacy.asp" target="_blank" rel="noopener noreferrer">Leggi l'informativa completa →</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Thank you -->
+    <div class="thankyou" id="thanks">
+      <div class="check-circle">✓</div>
+      <h2>Grazie.</h2>
+      <p>Le vostre risposte le leggiamo noi,<br>di persona, prima del vostro appuntamento.<br><br>A presto — Il Team Fly Flot</p>
+    </div>
+
+    <!-- Error -->
+    <div class="errscreen" id="errscreen">
+      <div class="err-circle">!</div>
+      <h2>Qualcosa è andato storto.</h2>
+      <p>Non siamo riusciti a inviare le vostre risposte.<br>Provate di nuovo, oppure scriveteci direttamente.</p>
+      <button class="btn-retry" onclick="retrySubmit()">Riprova</button>
+    </div>
+
+    <!-- Navigation -->
+    <div class="nav" id="nav">
+      <button class="btn-back hidden" id="btnBack" onclick="back()">← Indietro</button>
+      <span class="step-ct" id="stepCt">1 di 5</span>
+      <button class="btn-next" id="btnNext" onclick="next()" disabled>Avanti →</button>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // ========================================================================
+  // !!! CONFIGURE THIS !!!
+  // Incolla qui l'URL del tuo Google Apps Script Web App dopo il deploy.
+  // Es: 'https://script.google.com/macros/s/AKfycb.../exec'
+  const SCRIPT_URL = 'https://hook.eu1.make.com/v3a6s3ouez73qsq2fjvn93aw188v0laf';
+  // ========================================================================
+
+  let cur = 1;
+  const tot = 5;
+  const ans = {};
+  let identityChoice = null;
+
+  function selectOpt(el, q) {
+    document.querySelectorAll('#' + q + ' .opt').forEach(o => o.classList.remove('selected'));
+    el.classList.add('selected');
+    ans[q] = el.textContent.trim();
+    updateNav();
+  }
+
+  function selectIdentity(el, withData) {
+    document.querySelectorAll('#q5 .opt').forEach(o => o.classList.remove('selected'));
+    el.classList.add('selected');
+    identityChoice = withData;
+    document.getElementById('idFields').classList.toggle('show', withData);
+    if (!withData) {
+      document.getElementById('fAzienda').value = '';
+      document.getElementById('fNome').value = '';
+      document.getElementById('fCognome').value = '';
+      document.getElementById('fEmail').value = '';
+    }
+    updateNav();
+  }
+
+  function isValidEmail(e) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
+  }
+
+  function isStepValid() {
+    if (cur >= 1 && cur <= 3) return !!ans['q' + cur];
+    if (cur === 4) return true;
+    if (cur === 5) {
+      if (identityChoice === null) return false;
+      if (identityChoice === false) return true;
+      const a = document.getElementById('fAzienda').value.trim();
+      const n = document.getElementById('fNome').value.trim();
+      const c = document.getElementById('fCognome').value.trim();
+      const e = document.getElementById('fEmail').value.trim();
+      // Azienda, nome e cognome obbligatori. Email facoltativa: se vuota va bene, se compilata deve essere valida.
+      if (a.length < 2 || n.length < 1 || c.length < 1) return false;
+      if (e.length > 0 && !isValidEmail(e)) return false;
+      return true;
+    }
+    return false;
+  }
+
+  function updateNav() {
+    document.getElementById('btnNext').disabled = !isStepValid();
+  }
+
+  function ui() {
+    document.querySelectorAll('.q-wrap').forEach(s => s.classList.remove('active'));
+    document.getElementById('q' + cur).classList.add('active');
+    document.getElementById('prog').style.width = ((cur - 1) / tot * 100) + '%';
+    document.getElementById('stepCt').textContent = cur + ' di ' + tot;
+    document.getElementById('btnBack').classList.toggle('hidden', cur === 1);
+    document.getElementById('btnNext').textContent = cur === tot ? 'Invia →' : 'Avanti →';
+    updateNav();
+  }
+
+  function next() {
+    if (!isStepValid()) return;
+    if (cur < tot) {
+      if (cur === 4) ans.q4 = document.getElementById('q4text').value.trim();
+      cur++;
+      ui();
+    } else {
+      submit();
+    }
+  }
+
+  function back() {
+    if (cur > 1) { cur--; ui(); }
+  }
+
+  function showThanks() {
+    document.getElementById('prog').style.width = '100%';
+    document.querySelectorAll('.q-wrap').forEach(s => s.classList.remove('active'));
+    document.getElementById('errscreen').style.display = 'none';
+    document.getElementById('thanks').style.display = 'block';
+    document.getElementById('nav').style.display = 'none';
+  }
+
+  function showError() {
+    document.querySelectorAll('.q-wrap').forEach(s => s.classList.remove('active'));
+    document.getElementById('thanks').style.display = 'none';
+    document.getElementById('errscreen').style.display = 'block';
+    document.getElementById('nav').style.display = 'none';
+  }
+
+  function retrySubmit() {
+    document.getElementById('errscreen').style.display = 'none';
+    document.getElementById('q5').classList.add('active');
+    document.getElementById('nav').style.display = 'flex';
+    submit();
+  }
+
+  async function submit() {
+    const btn = document.getElementById('btnNext');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span>';
+
+    if (!ans.q4) ans.q4 = document.getElementById('q4text').value.trim();
+
+    const payload = {
+      anonimo: !identityChoice,
+      azienda: identityChoice ? document.getElementById('fAzienda').value.trim() : '',
+      nome: identityChoice ? document.getElementById('fNome').value.trim() : '',
+      cognome: identityChoice ? document.getElementById('fCognome').value.trim() : '',
+      email: identityChoice ? document.getElementById('fEmail').value.trim() : '',
+      q1: ans.q1 || '',
+      q2: ans.q2 || '',
+      q3: ans.q3 || '',
+      q4: ans.q4 || ''
+    };
+
+    try {
+      // Invio in formato form-urlencoded: Make lo parsa come campi separati
+      const formData = new URLSearchParams();
+      Object.keys(payload).forEach(key => {
+        formData.append(key, payload[key]);
+      });
+      const res = await fetch(SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
+        body: formData.toString()
+      });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      showThanks();
+    } catch (err) {
+      console.error('Submit failed:', err);
+      btn.innerHTML = 'Invia →';
+      btn.disabled = false;
+      showError();
+    }
+  }
+
+  ui();
+</script>
+</body>
+</html>
