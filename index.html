@@ -480,13 +480,9 @@
     <!-- Q5: identity -->
     <div class="q-wrap" id="q5">
       <div class="q-meta">Quasi fatto.</div>
-      <div class="q-text" style="margin-bottom: 22px">Potete restare anonimi, oppure lasciare i vostri dati: scegliete voi.</div>
-      <div class="options">
-        <button class="opt" onclick="selectIdentity(this, true)"><div class="dot"><div class="dot-inner"></div></div>Voglio condividere i miei dati</button>
-        <button class="opt" onclick="selectIdentity(this, false)"><div class="dot"><div class="dot-inner"></div></div>Preferisco restare anonimo</button>
-      </div>
+      <div class="q-text" style="margin-bottom: 22px">Lasciateci i vostri dati per arrivare preparati al nostro incontro.</div>
 
-      <div class="id-fields" id="idFields">
+      <div class="id-fields show" id="idFields">
         <div class="id-field">
           <div class="id-field-label">Azienda o negozio</div>
           <input type="text" id="fAzienda" placeholder="Es. Calzature Rossi" oninput="updateNav()">
@@ -546,26 +542,11 @@
   let cur = 1;
   const tot = 5;
   const ans = {};
-  let identityChoice = null;
 
   function selectOpt(el, q) {
     document.querySelectorAll('#' + q + ' .opt').forEach(o => o.classList.remove('selected'));
     el.classList.add('selected');
     ans[q] = el.textContent.trim();
-    updateNav();
-  }
-
-  function selectIdentity(el, withData) {
-    document.querySelectorAll('#q5 .opt').forEach(o => o.classList.remove('selected'));
-    el.classList.add('selected');
-    identityChoice = withData;
-    document.getElementById('idFields').classList.toggle('show', withData);
-    if (!withData) {
-      document.getElementById('fAzienda').value = '';
-      document.getElementById('fNome').value = '';
-      document.getElementById('fCognome').value = '';
-      document.getElementById('fEmail').value = '';
-    }
     updateNav();
   }
 
@@ -577,8 +558,6 @@
     if (cur >= 1 && cur <= 3) return !!ans['q' + cur];
     if (cur === 4) return true;
     if (cur === 5) {
-      if (identityChoice === null) return false;
-      if (identityChoice === false) return true;
       const a = document.getElementById('fAzienda').value.trim();
       const n = document.getElementById('fNome').value.trim();
       const c = document.getElementById('fCognome').value.trim();
@@ -650,11 +629,11 @@
     if (!ans.q4) ans.q4 = document.getElementById('q4text').value.trim();
 
     const payload = {
-      anonimo: !identityChoice,
-      azienda: identityChoice ? document.getElementById('fAzienda').value.trim() : '',
-      nome: identityChoice ? document.getElementById('fNome').value.trim() : '',
-      cognome: identityChoice ? document.getElementById('fCognome').value.trim() : '',
-      email: identityChoice ? document.getElementById('fEmail').value.trim() : '',
+      anonimo: false,
+      azienda: document.getElementById('fAzienda').value.trim(),
+      nome: document.getElementById('fNome').value.trim(),
+      cognome: document.getElementById('fCognome').value.trim(),
+      email: document.getElementById('fEmail').value.trim(),
       q1: ans.q1 || '',
       q2: ans.q2 || '',
       q3: ans.q3 || '',
